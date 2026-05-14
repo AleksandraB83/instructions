@@ -23,6 +23,9 @@ import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
 
@@ -82,6 +85,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="DPS Signal Controller", lifespan=lifespan)
 
+# Настройка CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],            # Разрешить запросы с любых источников (для разработки)
+    allow_credentials=True,
+    allow_methods=["*"],            # Разрешить все HTTP-методы
+    allow_headers=["*"],            # Разрешить все заголовки
+)
 
 # ─── REST API ─────────────────────────────────────────────────────────────────
 
