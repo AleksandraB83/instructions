@@ -25,6 +25,7 @@
     mov x, osr
 
 .wrap_target
+loop_top:
     ; check direction pin (configured via sm_config_set_jmp_pin)
     jmp pin, backward   ; if pin high -> backward sequence
 
@@ -44,7 +45,7 @@ q3f: jmp y-- q3f
     set pins, 0         ; Q4
     mov y, x
 q4f: jmp y-- q4f
-    jmp wrap_end        ; finish this period, wrap back
+    jmp loop_top        ; finish this period, wrap back
 
 backward:
     set pins, 10        ; Q1
@@ -62,8 +63,6 @@ q3b: jmp y-- q3b
     set pins, 0         ; Q4
     mov y, x
 q4b: jmp y-- q4b
-    ; fall through to wrap
-wrap_end:
 .wrap
 
 % c-sdk {

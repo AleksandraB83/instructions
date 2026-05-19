@@ -15,9 +15,26 @@ static PIO  g_pio;
 static uint g_sm;
 static uint g_offset;
 
-// ... set_frequency() etc. ...
+static void set_frequency(uint32_t freq_hz) {
+    if (freq_hz == 0 || freq_hz > MAX_FREQ_HZ) return;
+    pio_sm_set_enabled(g_pio, g_sm, false);
+    square_4ch_program_init(g_pio, g_sm, g_offset, BASE_PIN, DIR_PIN, freq_hz);
+}
 
-static bool parse_freq(const char *buf, uint32_t *out) { /* ... как было ... */ }
+static bool parse_freq(const char *buf, uint32_t *out) {
+    const char *p = strstr(buf, "\"freq\"");
+    if (!p) p = strstr(buf, "\"frequency\"");
+    if (!p) return false;
+    while (*p && *p != ':') p++;
+    if (!*p) return false;
+    p++;
+    while (*p == ' ' || *p == '\t') p++;
+    char *end;
+    long v = strtol(p, &end, 10);
+    if (end == p || v <= 0) return false;
+    *out = (uint32_t)v;
+    return true;
+}
 
 static bool parse_direction(const char *buf, uint *out_dir) {
     const char *p = strstr(buf, "\"direction\"");
